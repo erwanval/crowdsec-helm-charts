@@ -1,6 +1,6 @@
 # crowdsec
 
-![Version: 0.9.9](https://img.shields.io/badge/Version-0.9.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.2](https://img.shields.io/badge/AppVersion-v1.5.2-informational?style=flat-square)
+![Version: 0.9.10](https://img.shields.io/badge/Version-0.9.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.5.2](https://img.shields.io/badge/AppVersion-v1.5.2-informational?style=flat-square)
 
 Crowdsec helm chart is an open-source, lightweight agent to detect and respond to bad behaviours.
 
@@ -40,14 +40,15 @@ Below a basic configuration for High availability
 
 # Configure external DB (https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-example)
 config:
-  config-override.yaml: |
+  config.yaml.local: |
     db_config:
-      type:     "postgresql"
-      user:     "crowdsec"
-      password: "${DB_PASSWORD}"
-      db_name:  "crowdsec"
-      host:     "192.168.0.2"
-      port:     "5432"
+      type:     postgresql
+      user:     crowdsec
+      password: ${DB_PASSWORD}
+      db_name:  crowdsec
+      host:     192.168.0.2
+      port:     5432
+      sslmode:  require
 
 lapi:
   # 2 or more replicas for HA
