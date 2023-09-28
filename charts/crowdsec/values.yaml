@@ -214,7 +214,7 @@ lapi:
   # -- affinity for lapi
   affinity: {}
   # -- topologySpreadConstraints for lapi
-  topologySpreadConstraints: {}
+  topologySpreadConstraints: []
 
   # -- Enable service monitoring (exposes "metrics" port "6060" for Prometheus)
   metrics:
