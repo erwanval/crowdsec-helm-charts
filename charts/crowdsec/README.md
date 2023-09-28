@@ -46,7 +46,7 @@ helm delete crowdsec -n crowdsec
 | config."console.yaml" | string | `""` |  |
 | config."capi_whitelists.yaml" | string | `""` |  |
 | config."profiles.yaml" | string | `""` | Profiles configuration (https://docs.crowdsec.net/docs/next/profiles/format/#profile-configuration-example) |
-| config."config-override.yaml" | string | `""` | General configuration (https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-example) |
+| config."config.yaml.local" | string | `""` | General configuration (https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-example) |
 | config.notifications | object | `{}` | notifications configuration (https://docs.crowdsec.net/docs/next/notification_plugins/intro) |
 | tls.enabled | bool | `false` |  |
 | tls.caBundle | bool | `true` |  |
