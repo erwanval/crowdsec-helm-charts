@@ -31,6 +31,50 @@ helm install crowdsec crowdsec/crowdsec -f crowdsec-values.yaml -n crowdsec
 helm delete crowdsec -n crowdsec
 ```
 
+## Setup for High Availability
+
+Below a basic configuration for High availability
+
+```
+# your-values.yaml
+
+# Configure external DB (https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-example)
+config:
+  config.yaml.local: |
+    db_config:
+      type:     postgresql
+      user:     crowdsec
+      password: ${DB_PASSWORD}
+      db_name:  crowdsec
+      host:     192.168.0.2
+      port:     5432
+      sslmode:  require
+
+lapi:
+  # 2 or more replicas for HA
+  replicas: 2
+  # You can specify your own CS_LAPI_SECRET, or let the chart generate one. Length must be >= 64
+  secrets:
+    csLapiSecret: <anyRandomSecret>
+  # Specify your external DB password here
+  extraSecrets:
+    dbPassword: <externalDbPassword>
+  persistentVolume:
+    # When replicas for LAPI is greater than 1, two options, persistent volumes must be disabled, or in ReadWriteMany mode
+    config:
+      enabled: false
+    # data volume is not required, since SQLite isn't used
+    data:
+      enabled: false
+  # DB Password passed through environment variable
+  env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: crowdsec-lapi-secrets
+          key: dbPassword
+```
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -86,7 +130,7 @@ helm delete crowdsec -n crowdsec
 | lapi.nodeSelector | object | `{}` | nodeSelector for lapi |
 | lapi.tolerations | object | `{}` | tolerations for lapi |
 | lapi.affinity | object | `{}` | affinity for lapi |
-| lapi.topologySpreadConstraints | object | `[]` | topologySpreadConstraints for lapi |
+| lapi.topologySpreadConstraints | list | `[]` | topologySpreadConstraints for lapi |
 | lapi.metrics | object | `{"enabled":false,"serviceMonitor":{"enabled":false}}` | Enable service monitoring (exposes "metrics" port "6060" for Prometheus) |
 | lapi.metrics.serviceMonitor | object | `{"enabled":false}` | See also: https://github.com/prometheus-community/helm-charts/issues/106#issuecomment-700847774 |
 | lapi.strategy.type | string | `"RollingUpdate"` |  |
