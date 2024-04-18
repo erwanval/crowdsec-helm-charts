@@ -31,6 +31,50 @@ helm install crowdsec crowdsec/crowdsec -f crowdsec-values.yaml -n crowdsec
 helm delete crowdsec -n crowdsec
 ```
 
+## Setup for High Availability
+
+Below a basic configuration for High availability
+
+```
+# your-values.yaml
+
+# Configure external DB (https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-example)
+config:
+  config.yaml.local: |
+    db_config:
+      type:     postgresql
+      user:     crowdsec
+      password: ${DB_PASSWORD}
+      db_name:  crowdsec
+      host:     192.168.0.2
+      port:     5432
+      sslmode:  require
+
+lapi:
+  # 2 or more replicas for HA
+  replicas: 2
+  # You can specify your own CS_LAPI_SECRET, or let the chart generate one. Length must be >= 64
+  secrets:
+    csLapiSecret: <anyRandomSecret>
+  # Specify your external DB password here
+  extraSecrets:
+    dbPassword: <externalDbPassword>
+  persistentVolume:
+    # When replicas for LAPI is greater than 1, two options, persistent volumes must be disabled, or in ReadWriteMany mode
+    config:
+      enabled: false
+    # data volume is not required, since SQLite isn't used
+    data:
+      enabled: false
+  # DB Password passed through environment variable
+  env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: crowdsec-lapi-secrets
+          key: dbPassword
+```
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -65,6 +109,7 @@ helm delete crowdsec -n crowdsec
 | secrets.password | string | `""` | agent password (default is generated randomly) |
 | lapi.replicas | int | `1` | replicas for local API |
 | lapi.env | list | `[]` | environment variables from crowdsecurity/crowdsec docker image |
+| lapi.envFrom | list | `[]` |  |
 | lapi.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/backend-protocol":"HTTP"},"enabled":false,"host":"","ingressClassName":""}` | Enable ingress lapi object |
 | lapi.priorityClassName | string | `""` | pod priority class name |
 | lapi.podAnnotations | object | `{}` | Annotations to be added to lapi pods, if global podAnnotations are not set |
@@ -94,13 +139,13 @@ helm delete crowdsec -n crowdsec
 | lapi.tolerations | list | `[]` | tolerations for lapi |
 | lapi.dnsConfig | object | `{}` | dnsConfig for lapi |
 | lapi.affinity | object | `{}` | affinity for lapi |
-| lapi.topologySpreadConstraints | object | `[]` | topologySpreadConstraints for lapi |
+| lapi.topologySpreadConstraints | list | `[]` | topologySpreadConstraints for lapi |
 | lapi.metrics | object | `{"enabled":false,"serviceMonitor":{"enabled":false}}` | Enable service monitoring (exposes "metrics" port "6060" for Prometheus) |
 | lapi.metrics.serviceMonitor | object | `{"enabled":false}` | See also: https://github.com/prometheus-community/helm-charts/issues/106#issuecomment-700847774 |
 | lapi.strategy.type | string | `"Recreate"` |  |
-| lapi.topologySpreadConstraints | object | `{}` | topologySpreadConstraints for lapi |
 | lapi.secrets.csLapiSecret | string | `""` | Shared LAPI secret. Will be generated randomly if not specified. Size must be > 64 characters |
 | lapi.extraSecrets | object | `{}` | Any extra secrets you may need (for example, external DB password) |
+| lapi.lifecycle | object | `{}` |  |
 | agent.additionalAcquisition | list | `[]` | To add custom acquisitions using available datasources (https://docs.crowdsec.net/docs/next/data_sources/intro) |
 | agent.acquisition[0] | object | `{"namespace":"","podName":"","poll_without_inotify":false,"program":""}` | Specify each pod you want to process it logs (namespace, podName and program) |
 | agent.acquisition[0].podName | string | `""` | to select pod logs to process |
