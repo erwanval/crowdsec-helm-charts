@@ -1,6 +1,6 @@
 # crowdsec
 
-![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.4](https://img.shields.io/badge/AppVersion-v1.6.4-informational?style=flat-square)
+![Version: 0.15.2](https://img.shields.io/badge/Version-0.15.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.4](https://img.shields.io/badge/AppVersion-v1.6.4-informational?style=flat-square)
 
 Crowdsec helm chart is an open-source, lightweight agent to detect and respond to bad behaviours.
 
@@ -291,6 +291,7 @@ controller:
 | lapi.metrics.serviceMonitor | object | `{"additionalLabels":{},"enabled":false}` | See also: https://github.com/prometheus-community/helm-charts/issues/106#issuecomment-700847774 |
 | lapi.strategy.type | string | `"Recreate"` |  |
 | lapi.secrets.csLapiSecret | string | `""` | Shared LAPI secret. Will be generated randomly if not specified. Size must be > 64 characters |
+| lapi.secrets.registrationToken | string | `""` | AppSec registration token. Will be generated randomly if not specified. |
 | lapi.extraSecrets | object | `{}` | Any extra secrets you may need (for example, external DB password) |
 | lapi.lifecycle | object | `{}` |  |
 | lapi.storeCAPICredentialsInSecret | bool | `false` | If set to true, the Central API credentials will be stored in a secret (to use when lapi replicas > 1) |
