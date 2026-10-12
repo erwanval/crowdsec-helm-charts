@@ -21,6 +21,7 @@ Crowdsec helm chart is an open-source, lightweight agent to detect and respond t
   - [Setup for AppSec (WAF)](#setup-for-appsec-waf)
     - [With Traefik](#with-traefik)
     - [With Nginx](#with-nginx)
+  - [Running pods in a user namespace](#running-pods-in-a-user-namespace)
   - [Parameters](#parameters)
     - [Global](#global)
     - [Image](#image)
@@ -498,6 +499,24 @@ controller:
           value: "true"
 ```
 
+## Running pods in a user namespace
+
+Check requirements on official documentation for [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/).
+One extra requirement: `user.max_user_namespaces` must be be greater than 0. Some systems (e.g Talos) set this to 0 by default, which leads to pods getting stuck in `ContainerCreating`.
+
+Set `hostUsers: false` for all pods, or per component (`lapi.hostUsers`, `agent.hostUsers` and `appsec.hostUsers`).
+When unset, the field is not rendered. Register Jobs follow the global value.
+
+```yaml
+hostUsers: false
+agent:
+  hostUsers: true # e.g. keep the agent on the host user namespace
+```
+
+> [!WARNING]
+> A cluster without user namespace support may ignore silently the field and run the pod as real root.
+> Check from inside a pod: `cat /proc/self/uid_map` must not print `0 0 4294967295`.
+
 ## Parameters
 
 ### Global
@@ -519,6 +538,7 @@ controller:
 | `image.kubectl.pullPolicy` | [string] kubectl image pull policy (Always, IfNotPresent, Never)                                                   | `IfNotPresent`           |
 | `podAnnotations`           | podAnnotations to be added to pods (string:string map)                                                             | `{}`                     |
 | `podLabels`                | Labels to be added to pods (string:string map)                                                                     | `{}`                     |
+| `hostUsers`                | Set pod.spec.hostUsers for all pods (false = user namespace)                                                       | `null`                   |
 
 ### Configuration
 
@@ -588,6 +608,7 @@ controller:
 | `lapi.extraInitContainers`                      | Additional init containers for LAPI pods                                                                                  | `[]`                |
 | `lapi.extraVolumes`                             | Additional volumes for LAPI pods                                                                                          | `[]`                |
 | `lapi.extraVolumeMounts`                        | Additional volumeMounts for LAPI pods                                                                                     | `[]`                |
+| `lapi.hostUsers`                                | pod.spec.hostUsers for LAPI pods                                                                                          | `null`              |
 | `lapi.podSecurityContext`                       | Security context for LAPI pods                                                                                            | `{}`                |
 | `lapi.securityContext`                          | Security context for the LAPI contaienr                                                                                   | `{}`                |
 | `lapi.resources`                                | Resource requests and limits for the LAPI pods                                                                            | `{}`                |
@@ -652,6 +673,7 @@ controller:
 | `agent.extraInitContainers`                      | Extra init containers for agent pods                                                       | `[]`    |
 | `agent.extraVolumes`                             | Extra volumes for agent pods                                                               | `[]`    |
 | `agent.extraVolumeMounts`                        | Extra volume mounts for agent pods                                                         | `[]`    |
+| `agent.hostUsers`                                | pod.spec.hostUsers for agent pods                                                          | `null`  |
 | `agent.podSecurityContext`                       | Security context for agent pods                                                            | `{}`    |
 | `agent.securityContext`                          | Security context for agent containers                                                      | `{}`    |
 | `agent.resources`                                | Resource requests and limits for agent pods                                                | `{}`    |
@@ -705,6 +727,7 @@ controller:
 | `appsec.extraInitContainers`                     | Extra init containers for AppSec pods                                                      | `[]`    |
 | `appsec.extraVolumes`                            | Extra volumes for AppSec pods                                                              | `[]`    |
 | `appsec.extraVolumeMounts`                       | Extra volume mounts for AppSec pods                                                        | `[]`    |
+| `appsec.hostUsers`                               | pod.spec.hostUsers for AppSec pods                                                         | `null`  |
 | `appsec.podSecurityContext`                      | Security context for AppSec pods                                                           | `{}`    |
 | `appsec.securityContext`                         | Security context for the appsec container                                                  | `{}`    |
 | `appsec.resources`                               | Resource requests and limits for AppSec pods                                               | `{}`    |

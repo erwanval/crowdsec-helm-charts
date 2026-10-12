@@ -44,6 +44,9 @@ spec:
 {{ toYaml .Values.lapi.podLabels | trim | indent 8 }}
         {{- end }}
     spec:
+      {{- with include "crowdsec.hostUsers" (dict "component" .Values.lapi.hostUsers "global" .Values.hostUsers) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.image.pullSecrets | indent 8 }}

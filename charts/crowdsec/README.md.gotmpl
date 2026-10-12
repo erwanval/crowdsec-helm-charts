@@ -21,6 +21,7 @@
 - [Setup for AppSec (WAF)](#setup-for-appsec-waf)
   - [With Traefik](#with-traefik)
   - [With Nginx](#with-nginx)
+- [Running pods in a user namespace](#running-pods-in-a-user-namespace)
 - [Values](#values)
 
 ## Chart Repository
@@ -481,6 +482,24 @@ controller:
         - name: SSL_VERIFY
           value: "true"
 ```
+
+## Running pods in a user namespace
+
+Check requirements on official documentation for [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/).
+One extra requirement: `user.max_user_namespaces` must be be greater than 0. Some systems (e.g Talos) set this to 0 by default, which leads to pods getting stuck in `ContainerCreating`.
+
+Set `hostUsers: false` for all pods, or per component (`lapi.hostUsers`, `agent.hostUsers` and `appsec.hostUsers`).
+When unset, the field is not rendered. Register Jobs follow the global value.
+
+```yaml
+hostUsers: false
+agent:
+  hostUsers: true # e.g. keep the agent on the host user namespace
+```
+
+> [!WARNING]
+> A cluster without user namespace support may ignore silently the field and run the pod as real root.
+> Check from inside a pod: `cat /proc/self/uid_map` must not print `0 0 4294967295`.
 
 {{ template "chart.homepageLine" . }}
 

@@ -39,6 +39,9 @@ spec:
 {{ toYaml .Values.agent.podLabels | trim | indent 8 }}
         {{- end }}
     spec:
+      {{- with include "crowdsec.hostUsers" (dict "component" .Values.agent.hostUsers "global" .Values.hostUsers) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{- if .Values.agent.serviceAccountName }}
       serviceAccountName: {{ .Values.agent.serviceAccountName }}
       {{- end }}
