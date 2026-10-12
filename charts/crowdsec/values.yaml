@@ -40,6 +40,10 @@ podAnnotations: {}
 ## @param podLabels [object] Labels to be added to pods (string:string map)
 podLabels: {}
 
+# -- Set pod.spec.hostUsers on all pods, unless overridden per component. `false` runs pods in a user namespace, null leaves the field out.
+## @param hostUsers [default: null] Set pod.spec.hostUsers for all pods (false = user namespace)
+hostUsers: null
+
 # Here you can specify your own custom configuration to be loaded in crowdsec agent or lapi
 # Each config needs to be a multi-line using '|' in YAML specs
 # for the agent those configs will be loaded : parsers, scenarios, postoverflows, simulation.yaml
@@ -313,6 +317,10 @@ lapi:
   ## @param lapi.extraVolumeMounts Additional volumeMounts for LAPI pods
   extraVolumeMounts: []
 
+  # -- Overrides the global hostUsers for LAPI pods
+  ## @param lapi.hostUsers [default: null] pod.spec.hostUsers for LAPI pods
+  hostUsers: null
+
   # -- Pod securityContext
   ## @param lapi.podSecurityContext [object] Security context for LAPI pods
   podSecurityContext: {}
@@ -538,6 +546,10 @@ agent:
   # -- Extra volumeMounts to be added to agent pods
   ## @param agent.extraVolumeMounts [array] Extra volume mounts for agent pods
   extraVolumeMounts: []
+
+  # -- Overrides the global hostUsers for agent pods
+  ## @param agent.hostUsers [default: null] pod.spec.hostUsers for agent pods
+  hostUsers: null
 
   # -- Pod securityContext
   ## @param agent.podSecurityContext [object] Security context for agent pods
@@ -832,6 +844,10 @@ appsec:
   # -- Extra volumeMounts to be added to appsec pods
   ## @param appsec.extraVolumeMounts [array] Extra volume mounts for AppSec pods
   extraVolumeMounts: []
+  # -- Overrides the global hostUsers for AppSec pods
+  ## @param appsec.hostUsers [default: null] pod.spec.hostUsers for AppSec pods
+  hostUsers: null
+
   # -- Pod securityContext
   ## @param appsec.podSecurityContext [object] Security context for AppSec pods
   podSecurityContext: {}

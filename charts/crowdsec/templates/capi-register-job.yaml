@@ -27,6 +27,9 @@ spec:
 {{ toYaml .Values.podLabels | trim | indent 8 }}
         {{- end }}
     spec:
+      {{- with include "crowdsec.hostUsers" (dict "global" .Values.hostUsers) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       serviceAccountName: {{ .Release.Name }}-configmap-updater-sa
       restartPolicy: OnFailure
       {{- if .Values.image.pullSecrets }}

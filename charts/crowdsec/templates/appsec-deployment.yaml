@@ -42,6 +42,9 @@ spec:
 {{ toYaml .Values.appsec.podLabels | trim | indent 8 }}
         {{- end }}
     spec:
+      {{- with include "crowdsec.hostUsers" (dict "component" .Values.appsec.hostUsers "global" .Values.hostUsers) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{- with .Values.appsec.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

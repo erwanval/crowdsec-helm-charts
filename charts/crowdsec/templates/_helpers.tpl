@@ -181,3 +181,14 @@ false
 {{ dig "storeLAPICscliCredentialsInSecret" (not .Values.lapi.persistentVolume.config.enabled) .Values.lapi }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+  pod.spec.hostUsers: component value, else global value, else omitted.
+*/}}
+{{- define "crowdsec.hostUsers" -}}
+{{- if kindIs "bool" .component -}}
+hostUsers: {{ .component }}
+{{- else if kindIs "bool" .global -}}
+hostUsers: {{ .global }}
+{{- end -}}
+{{- end -}}
